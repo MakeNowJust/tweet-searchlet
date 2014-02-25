@@ -22,6 +22,8 @@
  *     $ node build.js
  */
 
+try {
+
 var
 input = $input_pattern$;
 
@@ -92,3 +94,6 @@ ifrm.onload = function () {
 document.body.appendChild(form);
 document.body.appendChild(ifrm);
 
+} catch(e) {
+  alert('missing tweet. error message\n' + (e && e.stack ? e.stack : e));
+}
