@@ -55,6 +55,7 @@ message = {
 OAuth.completeRequest(message, accessor);
 
 var
+cssText = 'display: none;',
 form = document.createElement('form'),
 ifrm = document.createElement('iframe'),
 name = 'tweet-on-location-bar-' + Date.now(), flag;
@@ -63,6 +64,8 @@ name = 'tweet-on-location-bar-' + Date.now(), flag;
 form.action = message.action;
 form.method = message.method;
 form.target = name;
+
+form.style.cssText = cssText;
 
 //append parameters
 message.parameters.forEach(function (param) {
@@ -80,6 +83,8 @@ message.parameters.forEach(function (param) {
 ifrm.name = name;
 ifrm.src = 'about:blank';
 
+ifrm.style.cssText = cssText;
+
 flag = 0;
 ifrm.onload = function () {
   if (flag++ === 0) { //load "about:blank"
@@ -87,6 +92,7 @@ ifrm.onload = function () {
   } else {            //load update.json
     form.parentNode.removeChild(form);
     ifrm.parentNode.removeChild(ifrm);
+    form = ifrm = null;
   }
 };
 
@@ -95,5 +101,5 @@ document.body.appendChild(form);
 document.body.appendChild(ifrm);
 
 } catch(e) {
-  alert('missing tweet. error message\n' + (e && e.stack ? e.stack : e));
+  alert('missing tweet. error message:\n' + (e && e.stack ? e.stack : e));
 }

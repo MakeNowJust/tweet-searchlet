@@ -34,7 +34,7 @@ var
 program = require('commander');
 
 program
-  .version('0.1.1')
+  .version('0.1.2')
   .option('-i, --input-pattern <pattern>', 'string to replace INPUT_PATTERN of tweet.js (default: (function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1].replace(/\\{[^}]*\\}/g,eval)', String)
   .option('-o, --output <filename>', 'output filename (default: tweet.<screen_name>.js)', String)
   .option('-c, --config <filename>', 'configuration filename (default: ./config.json)', String)
