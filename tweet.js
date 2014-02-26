@@ -64,6 +64,7 @@ name = 'tweet-on-location-bar-' + Date.now(), flag;
 form.action = message.action;
 form.method = message.method;
 form.target = name;
+form.acceptCharset = 'utf-8'; //set accept-charset for no-utf-8 encoded site
 
 form.style.cssText = cssText;
 
