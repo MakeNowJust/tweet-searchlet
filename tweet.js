@@ -61,15 +61,18 @@ ifrm = document.createElement('iframe'),
 name = 'tweet-on-location-bar-' + Date.now(), flag;
 
 //setting form
-form.action = message.action;
+form.action = message.action + '?' + param[0] + '=' + OAuth.percentEncode(param[1]); //append "status" to URL for escaping
 form.method = message.method;
 form.target = name;
+form.enctype = 'application/x-www-form-urlencoded';
 form.acceptCharset = 'utf-8'; //set accept-charset for no-utf-8 encoded site
 
 form.style.cssText = cssText;
 
 //append parameters
 message.parameters.forEach(function (param) {
+  if (param[0] === 'status') return; //skip "status"
+  
   var
   input = document.createElement('input');
   

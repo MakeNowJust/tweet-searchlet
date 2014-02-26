@@ -34,10 +34,12 @@ var
 program = require('commander');
 
 program
-  .version('0.1.2')
+  .version('0.1.3')
   .option('-i, --input-pattern <pattern>', 'string to replace $input_pattern$ of tweet.js (default: (function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1].replace(/\\{[^}]*\\}/g,eval)', String)
   .option('-o, --output <filename>', 'output filename (default: tweet.<screen_name>.js)', String)
   .option('-c, --config <filename>', 'configuration filename (default: ./config.json)', String)
+  .option('-E, --no-escape', 'disable escape for searchlet')
+  .option('-P, --no-protocol', 'without "javascript:" protocol')
   .parse(process.argv);
 
 _.defaults(program, {
@@ -144,7 +146,7 @@ async.waterfall([
   },
   
   function replaceTweetJS(compressedSrc, next) {
-    compressedSrc = compressedSrc.replace(/%/g, ' % '); //escape for searchlet
+    if (program.escape) compressedSrc = compressedSrc.replace(/%/g, '%25'); //escape for searchlet
     compressedSrc = compressedSrc.replace('$input_pattern$', program.inputPattern);
     _.each(config, function (value, key) {
       compressedSrc = compressedSrc.replace('$' + key + '$', JSON.stringify(value));
@@ -153,7 +155,7 @@ async.waterfall([
   },
   
   function writeTweetCustomJS(replacedSrc, next) {
-    replacedSrc = 'javascript:' + replacedSrc; //append "javascript:" pseudo protocol
+    if (program.protocol) replacedSrc = 'javascript:' + replacedSrc; //append "javascript:" pseudo protocol
     fs.writeFile(program.output, replacedSrc, 'utf8', next);
   },
 ], function (err) {

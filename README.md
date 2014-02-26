@@ -45,9 +45,11 @@ $ node build.js --help
 
     -h, --help                     output usage information
     -V, --version                  output the version number
-    -i, --input-pattern <pattern>  string to replace $input_pattern$ of tweet.js (default: (function(){/*%s*/}).toString().match(//*(.*)*//)[1].replace(/\\{[^}]*\\}/g,eval)
+    -i, --input-pattern <pattern>  string to replace $input_pattern$ of tweet.js (default: (function(){/*%s*/}).toString().match(/\/\*(.*)\*\//)[1].replace(/\{[^}]*\}/g,eval)
     -o, --output <filename>        output filename (default: tweet.<screen_name>.js)
     -c, --config <filename>        configuration filename (default: ./config.json)
+    -E, --no-escape                disable escape for searchlet
+    -P, --no-protocol              without "javascript:" protocol
 ```
 
 for example, when you want bookmarklet version, you should do:
