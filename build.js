@@ -17,6 +17,7 @@
 //requires
 var
 fs       = require('fs'),
+path     = require('path'),
 qs       = require('qs'),
 async    = require('async'),
 _        = require('lodash'),
@@ -35,22 +36,26 @@ program = require('commander');
 
 program
   .version('0.1.3')
-  .option('-i, --input-pattern <pattern>', 'string to replace $input_pattern$ of tweet.js (default: (function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1].replace(/\\{[^}]*\\}/g,eval)', String)
+  .option('-i, --input-pattern <pattern>', 'string to replace $input_pattern$ of tweet.js (default: (function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1]', String)
   .option('-o, --output <filename>', 'output filename (default: tweet.<screen_name>.js)', String)
   .option('-c, --config <filename>', 'configuration filename (default: ./config.json)', String)
+  .option('-p, --plugin <filename>', 'plugin setting filename (default: ./plugin/default.plugin.json', String)
   .option('-E, --no-escape', 'disable escape for searchlet')
   .option('-P, --no-protocol', 'without "javascript:" protocol')
   .parse(process.argv);
 
 _.defaults(program, {
-  inputPattern: '(function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1].replace(/\\{[^}]*\\}/g,eval)',
+  inputPattern: '(function(){/*%s*/}).toString().match(/\\/\\*(.*)\\*\\//)[1]',
   output: 'tweet.<screen_name>.js',
+  plugin: './plugin/default.plugin.json',
   config: './config.json',
 });
 
 //main
 var
-config = require(program.config);
+config = require(program.config),
+plugin = require(program.plugin),
+pluginDir = path.dirname(path.resolve(program.plugin));
 
 async.waterfall([
   function checkAuthorized(next) {
@@ -115,6 +120,12 @@ async.waterfall([
       tasks[lib] = readFile('lib/' + lib, 'utf8');
     });
     
+    ['pre', 'post'].forEach(function (timing) {
+      plugin[timing].forEach(function (p) {
+        tasks[timing + p] = readFile(path.join(pluginDir, p), 'utf-8');
+      });
+    });
+    
     async.parallel(tasks, next);
   },
   
@@ -122,6 +133,17 @@ async.waterfall([
     var
     src = '(function (_OAuth) {\n';
     src += files.tweetJS;
+    
+    ['pre', 'post'].forEach(function (timing) {
+      src = src.replace('$$' + timing + '$$', function () {
+        return plugin[timing].map(function (p) {
+          return 'function (next) {' +
+                 (p.indexOf('async') === -1 ? files[timing + p] + ';\nnext();' : files[timing + p]) +
+                 '},';
+        }).join('\n');
+      });
+    });
+    
     src += '\n})(function () {\n';
     
     LIBS.forEach(function (lib) {
@@ -159,7 +181,7 @@ async.waterfall([
     fs.writeFile(program.output, replacedSrc, 'utf8', next);
   },
 ], function (err) {
-  if (err) return console.error(err);
+  if (err) throw err;
   
   console.log('successed to generate=> %s', program.output);
 });

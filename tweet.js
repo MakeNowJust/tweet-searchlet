@@ -27,6 +27,10 @@ try {
 var
 input = $input_pattern$;
 
+//pre processing
+async([$$pre$$
+function(next){
+
 var
 global = ('global', eval)('this'), //global eval magic!
 OAuth = _OAuth(); //load OAuth
@@ -61,7 +65,7 @@ ifrm = document.createElement('iframe'),
 name = 'tweet-on-location-bar-' + Date.now(), flag;
 
 //setting form
-form.action = message.action + '?' + param[0] + '=' + OAuth.percentEncode(param[1]); //append "status" to URL for escaping
+form.action = message.action;
 form.method = message.method;
 form.target = name;
 form.enctype = 'application/x-www-form-urlencoded';
@@ -71,7 +75,10 @@ form.style.cssText = cssText;
 
 //append parameters
 message.parameters.forEach(function (param) {
-  if (param[0] === 'status') return; //skip "status"
+  if (param[0] === 'status') {
+    form.action = message.action + '?' + param[0] + '=' + OAuth.percentEncode(param[1]); //append "status" to URL for escaping
+    return; //skip "status"
+  }
   
   var
   input = document.createElement('input');
@@ -94,16 +101,37 @@ ifrm.onload = function () {
   if (flag++ === 0) { //load "about:blank"
     setTimeout(function () { form.submit(); }, 0);
   } else {            //load update.json
+    //post processing
+    async([$$post$$
+    function (next) {
+    
     form.parentNode.removeChild(form);
     ifrm.parentNode.removeChild(ifrm);
     form = ifrm = null;
+    next();
+    }]);
   }
 };
 
 //append to html
 document.body.appendChild(form);
 document.body.appendChild(ifrm);
+next();
+}]);
 
-} catch(e) {
+} catch(e) { errorHandle(e); }
+
+function async(runs) {
+  try {
+    if (runs.length) {
+      runs.shift()(function (e) {
+        if (e) errorHandle(e);
+        else async(runs);
+      });
+    }
+  } catch (e) { errorHandle(e); }
+}
+
+function errorHandle(e) {
   alert('missing tweet. error message:\n' + (e && e.stack ? e.stack : e));
 }

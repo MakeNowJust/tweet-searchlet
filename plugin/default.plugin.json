@@ -1,4 +1,4 @@
 {
   "pre":  ["eval.js", "check140.js"],
-  "post": [],
+  "post": []
 }
