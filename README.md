@@ -32,7 +32,7 @@ prompt: pin:  *******
 successed to generate=> tweet.your_screen_name.js
 ```
 
-and you open Chrome `chrome://settings/searchEngines`, paste `tweet.your_screen_name.js`'s content as search engine's URL.
+and you open Chrome `chrome://settings/searchEngines`, paste `tweet.your_screen_name.js`'s content to search engine's URL.
 
 ##Custom build
 
@@ -71,4 +71,4 @@ this script includes these libraries:
 
 ##Author
 
-Tsuyusato Kitsune (@make_now_just) <makenowjust@myopera.com>
+Tsuyusato Kitsune (@make_now_just) <make.just.on@gmail.com>
