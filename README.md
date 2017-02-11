@@ -1,5 +1,7 @@
 #tweet searchlet
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/MakeNowJust/tweet-searchlet.svg)](https://greenkeeper.io/)
+
 let's tweet your browser's search bar!
 
 ##What is searchlet?
